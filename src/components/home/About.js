@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, useScroll, useTransform, useInView, useSpring } from 'framer-motion'
-import { ArrowRight, Award, Rocket, Clock, Target, Sparkles, Code, Briefcase, GraduationCap } from 'lucide-react'
+import { ArrowRight, Award, Rocket, Clock, Target, Sparkles, Code, Briefcase, GraduationCap, University } from 'lucide-react'
 
 const About = () => {
   const containerRef = useRef(null)
@@ -111,9 +111,10 @@ const About = () => {
       qualifications: [
         {
           degree: "Bachelor of Technology",
-          field: "Computer Science",
-          institution: "GITAM University",
-          year: "2018"
+          field: "Electronics and Communication Engineering",
+          institution: "Vidya Jyothi Institute of technology",
+          University: "JNTUH",
+          year: "2017"
         }
       ],
       certifications: [
