@@ -15,7 +15,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-      <body className="bg-white">
+      <body className="bg-white" suppressHydrationWarning>
         <Header />
         <main>{children}</main>
         <Footer />
