@@ -234,21 +234,14 @@ const TechBadge = ({ tech, color, lightColor }) => (
 const FeaturedProject = ({ project }) => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
-  const isInView = useInView(containerRef, { once: false, amount: 0.6 });
+  // Changed to use a more generous threshold for visibility
+  const isInView = useInView(containerRef, { once: false, amount: 0.2, margin: "0px 0px -100px 0px" });
   const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-  // Parallax effects
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
-
-  const y1 = useTransform(scrollYProgress, [0, 1], [50, -50]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-
+  // Removed parallax effects that might be causing visibility issues
+  
   // Auto-play video when in view
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -315,6 +308,10 @@ const FeaturedProject = ({ project }) => {
       className="relative"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      // Removed initial and animate properties tied to scrollYProgress
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
       <a
         href={project.link}
@@ -322,18 +319,13 @@ const FeaturedProject = ({ project }) => {
         rel="noopener noreferrer"
         className="block cursor-pointer"
       >
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5 }} // Faster fade-in
-          className="lg:grid lg:grid-cols-5 gap-12 items-center"
-        >
+        <div className="lg:grid lg:grid-cols-5 gap-12 items-center">
           {/* Project Details - Left Column */}
           <motion.div
             className="col-span-2 relative z-10 px-6 py-12 lg:py-0"
             initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.4, delay: 0.1 }} // Faster animation
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
             <div className="max-w-md mx-auto lg:mx-0">
               {/* Project header */}
@@ -341,8 +333,8 @@ const FeaturedProject = ({ project }) => {
                 <motion.div
                   className="mb-6"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.3, delay: 0.15 }} // Faster animation
+                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3, delay: 0.15 }}
                 >
                   <h3 className="text-sm font-semibold uppercase tracking-wider" style={{ color: project.color }}>
                     Featured Project
@@ -355,8 +347,8 @@ const FeaturedProject = ({ project }) => {
                 <motion.p
                   className="text-lg text-gray-600 mb-8 leading-relaxed"
                   initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.3, delay: 0.2 }} // Faster animation
+                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
                 >
                   {project.description}
                 </motion.p>
@@ -366,8 +358,8 @@ const FeaturedProject = ({ project }) => {
               <motion.div
                 className="mb-8"
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.3, delay: 0.25 }} // Faster animation
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, delay: 0.25 }}
               >
                 <h4 className="text-sm uppercase tracking-wider text-gray-500 font-medium mb-4">
                   Technical Craftsmanship
@@ -379,8 +371,8 @@ const FeaturedProject = ({ project }) => {
                       key={idx}
                       className="flex gap-3"
                       initial={{ opacity: 0, x: -20 }}
-                      animate={isInView ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.25, delay: 0.25 + (idx * 0.05) }} // Faster animation
+                      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                      transition={{ duration: 0.25, delay: 0.25 + (idx * 0.05) }}
                     >
                       <div className="flex-shrink-0 mt-1">
                         <div
@@ -402,8 +394,8 @@ const FeaturedProject = ({ project }) => {
               <motion.div
                 className="mb-8"
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.3, delay: 0.3 }} // Faster animation
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
               >
                 <h4 className="text-sm uppercase tracking-wider text-gray-500 font-medium mb-4">
                   Technology Stack
@@ -427,8 +419,8 @@ const FeaturedProject = ({ project }) => {
               <motion.div
                 className="inline-flex items-center gap-2 mt-8 text-primary-600"
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.3, delay: 0.35 }} // Faster animation
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, delay: 0.35 }}
                 style={{ color: project.color }}
               >
                 <span className="font-medium">Visit Live Project</span>
@@ -441,8 +433,8 @@ const FeaturedProject = ({ project }) => {
           <div className="col-span-3 relative">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.5, delay: 0.2 }} // Faster animation
+              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               className="relative aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl"
             >
               {/* Hero section with better aspect ratio management */}
@@ -485,7 +477,7 @@ const FeaturedProject = ({ project }) => {
                   opacity: isVideoPlaying ? 0 : 1
                 }}
                 initial={{ opacity: 0, y: 50 }}
-                animate={isInView ? { opacity: isVideoPlaying ? 0 : 1, y: 0 } : {}}
+                animate={isInView ? { opacity: isVideoPlaying ? 0 : 1, y: 0 } : { opacity: 0, y: 50 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
                 <div className="flex flex-col gap-4">
@@ -521,7 +513,7 @@ const FeaturedProject = ({ project }) => {
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             />
           </div>
-        </motion.div>
+        </div>
       </a>
     </motion.div>
   );
@@ -782,8 +774,6 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
 
                 {/* Project info layer */}
                 <div className="absolute inset-0 p-6 flex flex-col justify-between text-white z-10">
-                  
-
                   <div>
                     <div className="overflow-hidden">
                       <h3 className="text-xl font-bold mb-1 drop-shadow-lg">
@@ -823,15 +813,11 @@ const Projects = () => {
   const [featuredProject, setFeaturedProject] = useState(projectsData[0]);
   const sectionRef = useRef(null);
   const featuredRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
-
-  // Parallax effects
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  // Modified to use a less aggressive trigger for animations
+  const isInView = useInView(sectionRef, { once: false, amount: 0.1 });
+  
+  // Removed the scroll-based opacity and Y transformations
+  // that were causing the visibility issues
 
   // Handle gallery project selection
   const handleProjectSelect = (project) => {
@@ -856,12 +842,10 @@ const Projects = () => {
       <div className="absolute inset-0 overflow-hidden -z-10">
         <motion.div
           className="absolute top-0 -right-64 w-[600px] h-[600px] rounded-full bg-gradient-to-b from-blue-50 to-indigo-50 opacity-60 blur-3xl"
-          style={{ y: bgY }}
         />
 
         <motion.div
           className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-gradient-to-t from-purple-50 to-indigo-50 opacity-70 blur-3xl"
-          style={{ y: useTransform(bgY, v => -v * 0.5) }}
         />
 
         <div
@@ -878,8 +862,7 @@ const Projects = () => {
           className="absolute inset-0 opacity-10"
           style={{
             backgroundImage: `radial-gradient(#6366F1 0.5px, transparent 0.5px)`,
-            backgroundSize: '30px 30px',
-            opacity: opacity
+            backgroundSize: '30px 30px'
           }}
         />
       </div>
@@ -890,13 +873,13 @@ const Projects = () => {
           className="text-center max-w-3xl mx-auto mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4 }} // Faster animation
+          transition={{ duration: 0.4 }}
         >
           <motion.h2
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-600"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.4, delay: 0.05 }} // Faster animation
+            transition={{ duration: 0.4, delay: 0.05 }}
           >
             Crafted with Precision
           </motion.h2>
@@ -904,30 +887,23 @@ const Projects = () => {
             className="text-xl text-gray-600"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.4, delay: 0.1 }} // Faster animation
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
             Showcasing technical excellence and design sophistication
             across diverse industries
           </motion.p>
         </motion.div>
 
-        {/* Featured project with ref for scrolling */}
-        <div ref={featuredRef}>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.15 }} // Faster animation
-            className="mb-20"
-          >
-            <FeaturedProject project={featuredProject} />
-          </motion.div>
+        {/* Featured project with ref for scrolling - key fix: removed scroll-based animations */}
+        <div ref={featuredRef} className="mb-20">
+          <FeaturedProject project={featuredProject} />
         </div>
 
-        {/* Horizontal gallery with modified onClick */}
+        {/* Horizontal gallery */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.2 }} // Faster animation
+          transition={{ duration: 0.5, delay: 0.2 }}
           className="mb-20"
         >
           <div className="flex items-center justify-between mb-8">
@@ -935,7 +911,7 @@ const Projects = () => {
               className="text-2xl font-bold text-gray-900"
               initial={{ opacity: 0, x: -20 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.4, delay: 0.25 }} // Faster animation
+              transition={{ duration: 0.4, delay: 0.25 }}
             >
               Project Gallery
             </motion.h3>
@@ -951,7 +927,5 @@ const Projects = () => {
     </section>
   );
 };
-
-
 
 export default Projects;

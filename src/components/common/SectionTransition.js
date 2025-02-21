@@ -1,41 +1,72 @@
 'use client'
-
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 
 const SectionTransition = ({ children }) => {
   const [isMounted, setIsMounted] = useState(false)
+  const transitionRef = useRef(null)
   const { scrollY } = useScroll()
   
-  // Transform values based on scroll position
+  // Measure hero and viewport
+  const [heroHeight, setHeroHeight] = useState(0)
+  const [viewportHeight, setViewportHeight] = useState(0)
+  
+  useEffect(() => {
+    const updateMeasurements = () => {
+      setViewportHeight(window.innerHeight);
+      // Find hero element and measure its height
+      const heroElement = document.querySelector('main');
+      if (heroElement) {
+        const heroRect = heroElement.getBoundingClientRect();
+        const heroContent = heroElement.querySelector('[class*="z-30"]');
+        if (heroContent) {
+          setHeroHeight(heroContent.offsetHeight);
+        } else {
+          setHeroHeight(heroRect.height);
+        }
+      }
+    };
+    
+    if (isMounted) {
+      updateMeasurements();
+      window.addEventListener('resize', updateMeasurements);
+    }
+    
+    return () => window.removeEventListener('resize', updateMeasurements);
+  }, [isMounted]);
+  
+  // Calculate offset to coordinate with hero parallax
+  const safeScrollOffset = Math.max(0, heroHeight - viewportHeight + 100);
+  
+  // Transform values based on scroll position with responsive values
   const opacity = useTransform(
     scrollY, 
-    [50, 300], 
+    [safeScrollOffset, safeScrollOffset + 300],
     [0, 1]
   )
   
   const scale = useTransform(
     scrollY,
-    [0, 300],
+    [safeScrollOffset, safeScrollOffset + 300],
     [0.95, 1]
   )
   
   const y = useTransform(
     scrollY,
-    [0, 300],
+    [safeScrollOffset, safeScrollOffset + 300],
     [50, 0]
   )
   
   const blur = useTransform(
     scrollY,
-    [0, 300],
+    [safeScrollOffset, safeScrollOffset + 300],
     [6, 0]
   )
-
+  
   // Calculate the border radius value
   const borderRadius = useTransform(
     scrollY,
-    [0, 300],
+    [safeScrollOffset, safeScrollOffset + 300],
     [40, 0]
   )
 
@@ -49,7 +80,8 @@ const SectionTransition = ({ children }) => {
 
   return (
     <motion.div
-      style={{ 
+      ref={transitionRef}
+      style={{
         opacity,
         scale,
         y,
