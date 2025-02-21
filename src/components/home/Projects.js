@@ -15,7 +15,7 @@ const projectsData = [
     heroVideo: '/videos/hendrix-hero.mp4',
     heroImage: '/projects/hendrix-work.png',
     logo: '/logos/hendrix-logo.png',
-    link: 'https://hendrixpharma.com',
+    link: 'https://hendrix-pharma.vercel.app/',
     year: '2023',
     color: '#0284c7', // Tailwind blue-600
     accent: '#bae6fd', // Tailwind blue-200
@@ -47,7 +47,7 @@ const projectsData = [
     heroVideo: '/videos/law-hero.mp4',
     heroImage: '/projects/lawfirm-work.png',
     logo: '/logos/law-firm-logo.svg',
-    link: 'https://modernlawfirm.com',
+    link: 'https://om-associates.vercel.app/',
     year: '2022',
     color: '#0284c7', // Use same color as first project
     accent: '#bae6fd',
@@ -79,7 +79,7 @@ const projectsData = [
     heroVideo: '/videos/minimal-edge-hero.mp4',
     heroImage: '/projects/minimal-edge-work.png',
     logo: '/logos/minimal-edge-logo.svg',
-    link: 'https://www.minimaledgetech.com',
+    link: 'https://www.minimaledgetech.com/',
     year: '2023',
     color: '#0284c7', // Use same color as first project
     accent: '#bae6fd',
@@ -111,7 +111,7 @@ const projectsData = [
     heroVideo: '/videos/shawn-hero.mp4',
     heroImage: '/projects/shawn-work.png',
     logo: '/logos/shawn-logo.svg',
-    link: 'https://shawnglobal.com',
+    link: 'https://www.shawnglobalsolutions.com/',
     year: '2022',
     color: '#0284c7', // Use same color as first project
     accent: '#bae6fd',
@@ -143,7 +143,7 @@ const projectsData = [
     heroVideo: '/videos/dental-hero.mp4',
     heroImage: '/projects/oravive-work.jpg',
     logo: '/logos/dental-logo.svg',
-    link: 'https://dentalclinic.app',
+    link: 'https://oravive-dental-solutions.vercel.app/',
     year: '2021',
     color: '#0284c7', // Use same color as first project
     accent: '#bae6fd',
@@ -952,17 +952,6 @@ const Projects = () => {
   );
 };
 
-// Add required CSS for hiding scrollbars while maintaining functionality
-const style = document.createElement('style');
-style.textContent = `
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-`;
-document.head.appendChild(style);
+
 
 export default Projects;

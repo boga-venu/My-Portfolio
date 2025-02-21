@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState, Suspense } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, useScroll, useTransform, useAnimation, useMotionValue } from 'framer-motion';
 import { ArrowRight, Github, Linkedin, Mail, Code2, Database, Sparkles } from 'lucide-react';
 
@@ -253,25 +253,77 @@ const Hero = () => {
   const [isDesktop, setIsDesktop] = useState(false);
   const heroContentRef = useRef(null);
   const [contentHeight, setContentHeight] = useState(0);
-  
-  // Scroll animations - MOVED INSIDE the component
+  const cardPositionsRef = useRef([]);
+
+  const mousePositionRef = useRef({ x: 0, y: 0 });
+
+  // Scroll animations
   const { scrollY } = useScroll();
-  
   const [viewportHeight, setViewportHeight] = useState(0);
 
-  // Update viewport height on mount and resize
+  // Card proximity check - defined as a memoized callback
+  const checkCardProximity = useCallback((mouseX, mouseY) => {
+    let near = false;
+    
+    cardPositionsRef.current.forEach(pos => {
+      const distance = Math.sqrt(
+        Math.pow(mouseX - pos.x, 2) + Math.pow(mouseY - pos.y, 2)
+      );
+      if (distance < 300) near = true;
+    });
+
+    setIsNearCard(near);
+  }, []);
+
+  // Update viewport height and card positions on mount and resize
   useEffect(() => {
     const updateMeasurements = () => {
       setViewportHeight(window.innerHeight);
       if (heroContentRef.current) {
         setContentHeight(heroContentRef.current.offsetHeight);
       }
+      
+      // Update card positions
+      cardPositionsRef.current = [
+        { x: window.innerWidth * 0.85, y: window.innerHeight * 0.4 },
+        { x: window.innerWidth * 0.15, y: window.innerHeight * 0.6 }
+      ];
     };
     
     updateMeasurements();
     window.addEventListener('resize', updateMeasurements);
     return () => window.removeEventListener('resize', updateMeasurements);
   }, []);
+
+  // Check device size on mount and resize
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsDesktop(window.innerWidth >= 1024); // Only show cards on larger desktops
+    };
+
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+
+  // Mouse movement handling
+  useEffect(() => {
+    if (!isDesktop) return;
+
+    const handleMouseMove = (e) => {
+      // Store real-time position in ref (doesn't cause re-render)
+      mousePositionRef.current = { x: e.clientX, y: e.clientY };
+      
+      // Update state less frequently using requestAnimationFrame
+      requestAnimationFrame(() => {
+        setMousePosition(mousePositionRef.current);
+        checkCardProximity(mousePositionRef.current.x, mousePositionRef.current.y);
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [isDesktop, checkCardProximity]);
 
   const safeScrollOffset = Math.max(0, contentHeight - viewportHeight + 100);
 
@@ -293,49 +345,6 @@ const Hero = () => {
     [safeScrollOffset, safeScrollOffset + 400],
     [0, 100]
   );
-
-
-  // Check device size on mount and resize
-  useEffect(() => {
-    const checkDevice = () => {
-      setIsDesktop(window.innerWidth >= 1024); // Only show cards on larger desktops
-    };
-
-    checkDevice();
-    window.addEventListener('resize', checkDevice);
-    return () => window.removeEventListener('resize', checkDevice);
-  }, []);
-
-  // Mouse movement handling
-  useEffect(() => {
-    if (!isDesktop) return;
-
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      checkCardProximity(e.clientX, e.clientY);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isDesktop]);
-
-  // Card proximity check
-  const checkCardProximity = (mouseX, mouseY) => {
-    let near = false;
-    const cardPositions = [
-      { x: window.innerWidth * 0.85, y: window.innerHeight * 0.4 },
-      { x: window.innerWidth * 0.15, y: window.innerHeight * 0.6 }
-    ];
-
-    cardPositions.forEach(pos => {
-      const distance = Math.sqrt(
-        Math.pow(mouseX - pos.x, 2) + Math.pow(mouseY - pos.y, 2)
-      );
-      if (distance < 300) near = true;
-    });
-
-    setIsNearCard(near);
-  };
 
   const skillCategories = [
     {
@@ -365,8 +374,6 @@ const Hero = () => {
       ]
     }
   ];
-
-  
 
   return (
     <motion.main
