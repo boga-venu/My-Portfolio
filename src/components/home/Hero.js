@@ -251,12 +251,49 @@ const Hero = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isNearCard, setIsNearCard] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const heroContentRef = useRef(null);
+  const [contentHeight, setContentHeight] = useState(0);
   
   // Scroll animations - MOVED INSIDE the component
   const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const heroY = useTransform(scrollY, [0, 400], [0, 200]);
-  const backgroundY = useTransform(scrollY, [0, 400], [0, 100]);
+  
+  const [viewportHeight, setViewportHeight] = useState(0);
+
+  // Update viewport height on mount and resize
+  useEffect(() => {
+    const updateMeasurements = () => {
+      setViewportHeight(window.innerHeight);
+      if (heroContentRef.current) {
+        setContentHeight(heroContentRef.current.offsetHeight);
+      }
+    };
+    
+    updateMeasurements();
+    window.addEventListener('resize', updateMeasurements);
+    return () => window.removeEventListener('resize', updateMeasurements);
+  }, []);
+
+  const safeScrollOffset = Math.max(0, contentHeight - viewportHeight + 100);
+
+  // Adjust parallax to start after safe offset
+  const heroOpacity = useTransform(
+    scrollY, 
+    [safeScrollOffset, safeScrollOffset + 400], 
+    [1, 0]
+  );
+  
+  const heroY = useTransform(
+    scrollY,
+    [safeScrollOffset, safeScrollOffset + 400],
+    [0, 200]
+  );
+  
+  const backgroundY = useTransform(
+    scrollY,
+    [safeScrollOffset, safeScrollOffset + 400],
+    [0, 100]
+  );
+
 
   // Check device size on mount and resize
   useEffect(() => {
@@ -329,6 +366,8 @@ const Hero = () => {
     }
   ];
 
+  
+
   return (
     <motion.main
       className="relative min-h-screen bg-gradient-to-b from-gray-50 to-white overflow-hidden"
@@ -388,6 +427,7 @@ const Hero = () => {
 
       {/* Main content - Properly positioned for all devices */}
       <motion.div
+        ref={heroContentRef}
         className="relative z-30 min-h-screen flex flex-col justify-center px-6 pt-20"
         style={{ y: heroY }}
       >
