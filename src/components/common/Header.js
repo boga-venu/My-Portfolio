@@ -219,7 +219,7 @@ const Header = () => {
           </motion.button>
         </nav>
 
-        {/* Mobile Navigation - Full Screen Overlay */}
+        {/* Mobile Navigation - Full Screen Overlay - Fixed solid background */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -228,8 +228,9 @@ const Header = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
+              style={{ backgroundColor: 'white' }} // Enforcing solid background
             >
-              <div className="flex flex-col p-6">
+              <div className="flex flex-col p-6 bg-white"> {/* Added bg-white here as well */}
                 {/* Navigation Links */}
                 <nav className="mb-8">
                   {navItems.map((item, index) => (
@@ -238,6 +239,7 @@ const Header = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.1 + (index * 0.05) }}
+                      className="bg-white" // Added to ensure link container is opaque
                     >
                       <button
                         onClick={() => {
