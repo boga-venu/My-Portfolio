@@ -234,27 +234,68 @@ const TechBadge = ({ tech, color, lightColor }) => (
 const FeaturedProject = ({ project }) => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
-  // Changed to use a more generous threshold for visibility
   const isInView = useInView(containerRef, { once: false, amount: 0.2, margin: "0px 0px -100px 0px" });
   const [isHovered, setIsHovered] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-
-  // Removed parallax effects that might be causing visibility issues
+  const [currentProjectId, setCurrentProjectId] = useState(project.id);
   
-  // Auto-play video when in view
+  // Handle project change
+  useEffect(() => {
+    // If the project changes, reset video state
+    if (project.id !== currentProjectId) {
+      setCurrentProjectId(project.id);
+      setIsVideoLoaded(false);
+      setIsVideoPlaying(false);
+      
+      // If there's a video element, update its src immediately
+      if (videoRef.current && project.heroVideo) {
+        videoRef.current.src = project.heroVideo;
+        videoRef.current.load();
+      }
+    }
+  }, [project.id, currentProjectId, project.heroVideo]);
+  
+  // Auto-play video when in view and after project change
   useEffect(() => {
     const videoElement = videoRef.current;
-    if (!videoElement) return;
+    if (!videoElement || !project.heroVideo) return;
+
+    // Set video source if not already set
+    if (!videoElement.src) {
+      videoElement.src = project.heroVideo;
+      videoElement.load();
+    }
 
     if (isInView) {
-      videoElement.play().then(() => {
-        setIsVideoPlaying(true);
-      }).catch(error => {
-        console.error("Video play failed:", error);
-        setIsVideoPlaying(false);
-      });
+      // Try to play the video
+      const playVideo = () => {
+        videoElement.play().then(() => {
+          setIsVideoPlaying(true);
+        }).catch(error => {
+          console.error("Video play failed:", error);
+          setIsVideoPlaying(false);
+        });
+      };
+
+      // If video metadata is already loaded
+      if (videoElement.readyState >= 2) {
+        playVideo();
+      } else {
+        // Wait for metadata to load
+        const handleCanPlay = () => {
+          setIsVideoLoaded(true);
+          playVideo();
+          videoElement.removeEventListener('canplay', handleCanPlay);
+        };
+        
+        videoElement.addEventListener('canplay', handleCanPlay);
+        return () => {
+          videoElement.removeEventListener('canplay', handleCanPlay);
+        };
+      }
     } else {
+      // Pause video when out of view
       videoElement.pause();
       setIsVideoPlaying(false);
     }
@@ -264,43 +305,21 @@ const FeaturedProject = ({ project }) => {
         videoElement.pause();
       }
     };
-  }, [isInView, project.id]);
+  }, [isInView, project.heroVideo, project.id]);
 
   // Handle video playback on hover (backup in case autoplay fails)
   useEffect(() => {
     const videoElement = videoRef.current;
-    if (!videoElement || isVideoPlaying) return;
+    if (!videoElement || !project.heroVideo || isVideoPlaying) return;
 
-    if (isHovered) {
+    if (isHovered && videoElement.readyState >= 2) {
       videoElement.play().then(() => {
         setIsVideoPlaying(true);
       }).catch(error => {
         console.error("Video play failed:", error);
-        setIsVideoPlaying(false);
       });
     }
-  }, [isHovered, isVideoPlaying]);
-
-  // Handle video loading
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) return;
-
-    const handleCanPlay = () => {
-      setIsVideoLoaded(true);
-    };
-
-    videoElement.addEventListener('canplay', handleCanPlay);
-
-    // Check if already loaded
-    if (videoElement.readyState >= 3) {
-      setIsVideoLoaded(true);
-    }
-
-    return () => {
-      videoElement.removeEventListener('canplay', handleCanPlay);
-    };
-  }, []);
+  }, [isHovered, isVideoPlaying, project.heroVideo]);
 
   return (
     <motion.div
@@ -308,7 +327,6 @@ const FeaturedProject = ({ project }) => {
       className="relative"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      // Removed initial and animate properties tied to scrollYProgress
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -326,6 +344,7 @@ const FeaturedProject = ({ project }) => {
             initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
             transition={{ duration: 0.4, delay: 0.1 }}
+            key={`details-${project.id}`} // Key for proper re-rendering
           >
             <div className="max-w-md mx-auto lg:mx-0">
               {/* Project header */}
@@ -436,31 +455,31 @@ const FeaturedProject = ({ project }) => {
               animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="relative aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl"
+              key={`preview-${project.id}`} // Key for proper re-rendering
             >
               {/* Hero section with better aspect ratio management */}
               <div className="absolute inset-0 bg-gray-900">
-                {/* Base background image - lowest layer */}
+                {/* Base background image - always visible until video is ready */}
                 <img
                   src={project.heroImage || project.image}
                   alt={`${project.title} background`}
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{
                     zIndex: 1,
-                    transition: "opacity 500ms ease",
                     opacity: isVideoPlaying ? 0 : 1,
+                    transition: "opacity 500ms ease",
                   }}
                 />
 
-                {/* Video layer - middle layer */}
+                {/* Video layer - optimized for loading */}
                 {project.heroVideo && (
                   <video
                     ref={videoRef}
-                    src={project.heroVideo}
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{
                       zIndex: 2,
-                      transition: "opacity 500ms ease",
                       opacity: isVideoPlaying ? 1 : 0,
+                      transition: "opacity 500ms ease"
                     }}
                     muted
                     playsInline
@@ -519,7 +538,7 @@ const FeaturedProject = ({ project }) => {
   );
 };
 
-// Horizontal scrolling project gallery with auto-scrolling behavior
+// Horizontal scrolling project gallery with optimized performance
 const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
   const galleryRef = useRef(null);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
@@ -539,8 +558,8 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
     config: { damping: 25, stiffness: 350 }
   });
 
-  // Refs for videos
-  const videoRefs = useRef(new Map());
+  // Refs for videos - use object instead of Map for better performance
+  const videoRefs = useRef({});
 
   // Check if mobile
   useEffect(() => {
@@ -553,57 +572,59 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
-  // Auto-scroll gallery for demonstration
+  // Auto-scroll gallery with performance optimization
   useEffect(() => {
     if (!galleryRef.current || !autoScrollEnabled || isHovering) return;
 
     const gallery = galleryRef.current;
-    const autoScroll = () => {
-      if (!gallery || !autoScrollEnabled || isHovering) return;
-
-      // Scroll 400px to the right (roughly one card width) over 1.5 seconds
-      const scrollStart = gallery.scrollLeft;
-      const scrollTarget = scrollStart + 400;
-      const startTime = Date.now();
-      const duration = 1500;
-
-      const scrollStep = () => {
+    let scrollInterval;
+    let animationId;
+    
+    const startAutoScroll = () => {
+      // Clear any existing intervals
+      clearInterval(scrollInterval);
+      
+      scrollInterval = setInterval(() => {
         if (!gallery || !autoScrollEnabled || isHovering) return;
-
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeProgress = 0.5 - Math.cos(progress * Math.PI) / 2; // Smooth ease in-out
-
-        gallery.scrollLeft = scrollStart + (easeProgress * 400);
-
-        if (progress < 1) {
-          requestAnimationFrame(scrollStep);
-        } else {
-          // Reset to beginning if we're near the end
-          if (gallery.scrollLeft > gallery.scrollWidth - gallery.clientWidth - 100) {
-            gallery.scrollLeft = 0;
+        
+        const scrollStart = gallery.scrollLeft;
+        const scrollTarget = scrollStart + 400;
+        const startTime = Date.now();
+        const duration = 1500;
+        
+        // Cancel any ongoing animation
+        cancelAnimationFrame(animationId);
+        
+        const scrollStep = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easeProgress = 0.5 - Math.cos(progress * Math.PI) / 2; // Smooth ease in-out
+          
+          gallery.scrollLeft = scrollStart + (easeProgress * 400);
+          
+          if (progress < 1) {
+            animationId = requestAnimationFrame(scrollStep);
+          } else {
+            // Reset to beginning if we're near the end
+            if (gallery.scrollLeft > gallery.scrollWidth - gallery.clientWidth - 100) {
+              gallery.scrollLeft = 0;
+            }
           }
-        }
-      };
-
-      requestAnimationFrame(scrollStep);
+        };
+        
+        scrollStep();
+      }, 6000); // 6 seconds between scrolls
     };
-
+    
     // Start auto-scrolling after a delay
     const timer = setTimeout(() => {
-      autoScroll();
+      startAutoScroll();
     }, 2000); // 2 second delay before first scroll
-
-    // Set interval for continued scrolling
-    const interval = setInterval(() => {
-      if (!isHovering) {
-        autoScroll();
-      }
-    }, 6000); // 6 seconds between scrolls
-
+    
     return () => {
       clearTimeout(timer);
-      clearInterval(interval);
+      clearInterval(scrollInterval);
+      cancelAnimationFrame(animationId);
     };
   }, [autoScrollEnabled, isHovering]);
 
@@ -611,11 +632,26 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
   useEffect(() => {
     if (isMobile || !galleryRef.current) return;
 
+    let animationId;
+    
     const handleMouseMove = (e) => {
-      const rect = galleryRef.current.getBoundingClientRect();
-      setCursorPosition({
-        x: e.clientX,
-        y: e.clientY - rect.top
+      // Using requestAnimationFrame for better performance
+      cancelAnimationFrame(animationId);
+      
+      animationId = requestAnimationFrame(() => {
+        if (!galleryRef.current) return;
+        
+        const rect = galleryRef.current.getBoundingClientRect();
+        setCursorPosition({
+          x: e.clientX,
+          y: e.clientY - rect.top
+        });
+        
+        const widthPercentage = (e.clientX - rect.left) / rect.width;
+        const newType = widthPercentage > 0.9 || widthPercentage < 0.1 ? 'scroll' : 'view';
+        if (newType !== cursorType) {
+          setCursorType(newType);
+        }
       });
     };
 
@@ -629,29 +665,50 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
       setIsHovering(false);
     };
 
-    galleryRef.current.addEventListener('mousemove', handleMouseMove);
-    galleryRef.current.addEventListener('mouseenter', handleMouseEnter);
-    galleryRef.current.addEventListener('mouseleave', handleMouseLeave);
+    const galleryElement = galleryRef.current;
+    galleryElement.addEventListener('mousemove', handleMouseMove, { passive: true });
+    galleryElement.addEventListener('mouseenter', handleMouseEnter);
+    galleryElement.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
-      if (galleryRef.current) {
-        galleryRef.current.removeEventListener('mousemove', handleMouseMove);
-        galleryRef.current.removeEventListener('mouseenter', handleMouseEnter);
-        galleryRef.current.removeEventListener('mouseleave', handleMouseLeave);
+      cancelAnimationFrame(animationId);
+      if (galleryElement) {
+        galleryElement.removeEventListener('mousemove', handleMouseMove);
+        galleryElement.removeEventListener('mouseenter', handleMouseEnter);
+        galleryElement.removeEventListener('mouseleave', handleMouseLeave);
       }
     };
-  }, [isMobile]);
+  }, [isMobile, cursorType]);
 
   // Handle video interactions
   const handleCardHover = (projectId, isHovering) => {
-    const videoElement = videoRefs.current.get(projectId);
+    const videoElement = videoRefs.current[projectId];
     if (!videoElement) return;
 
     if (isHovering) {
-      videoElement.play().catch(e => console.log("Video play prevented:", e));
+      // Only set the source if it's not already set
+      if (!videoElement.src && projects.find(p => p.id === projectId)?.heroVideo) {
+        videoElement.src = projects.find(p => p.id === projectId).heroVideo;
+      }
+      
+      // Only try to play if it has loaded enough data
+      if (videoElement.readyState >= 2) {
+        videoElement.play().catch(e => {
+          // Silent catch - we don't want to spam the console
+        });
+      } else if (videoElement.src) {
+        // Add a one-time handler to play when ready
+        const handleCanPlay = () => {
+          videoElement.play().catch(() => {});
+          videoElement.removeEventListener('canplay', handleCanPlay);
+        };
+        videoElement.addEventListener('canplay', handleCanPlay, { once: true });
+      }
     } else {
-      videoElement.pause();
-      videoElement.currentTime = 0;
+      if (videoElement.readyState > 0) {
+        videoElement.pause();
+        videoElement.currentTime = 0;
+      }
     }
   };
 
@@ -703,20 +760,13 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
       <div
         ref={galleryRef}
         className="overflow-x-auto hide-scrollbar py-12"
-        onMouseMove={(e) => {
-          if (!galleryRef.current) return;
-          const rect = galleryRef.current.getBoundingClientRect();
-          const widthPercentage = (e.clientX - rect.left) / rect.width;
-          setCursorType(widthPercentage > 0.9 || widthPercentage < 0.1 ? 'scroll' : 'view');
-        }}
         onTouchStart={() => setAutoScrollEnabled(false)} // Disable auto-scroll when user interacts
       >
         <div className="min-w-max flex gap-8 px-8">
           {projects.map((project) => (
             <div
               key={project.id}
-              className={`w-[300px] md:w-[400px] flex-shrink-0 ${project.id === currentFeatured ? 'opacity-50' : ''
-                }`}
+              className={`w-[300px] md:w-[400px] flex-shrink-0 ${project.id === currentFeatured ? 'opacity-50' : ''}`}
               onMouseEnter={() => {
                 setCursorType('view');
                 handleCardHover(project.id, true);
@@ -740,13 +790,14 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
                       transition: "transform 700ms ease",
                       transform: "scale(1.0)"
                     }}
+                    loading="lazy"
                   />
 
                   {/* Video layer */}
                   {project.heroVideo && (
                     <video
                       ref={(el) => {
-                        if (el) videoRefs.current.set(project.id, el);
+                        if (el) videoRefs.current[project.id] = el;
                       }}
                       className="absolute inset-0 w-full h-full object-cover"
                       style={{
@@ -754,11 +805,10 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
                         opacity: 0, // Start hidden
                         transition: 'opacity 500ms ease'
                       }}
-                      src={project.heroVideo}
                       muted
                       playsInline
                       loop
-                      preload="metadata"
+                      preload="none" // Changed from metadata to none for better performance
                     />
                   )}
 
@@ -791,7 +841,6 @@ const HorizontalGallery = ({ projects, onSelect, currentFeatured }) => {
                   </div>
                 )}
               </motion.div>
-
             </div>
           ))}
         </div>
@@ -813,11 +862,7 @@ const Projects = () => {
   const [featuredProject, setFeaturedProject] = useState(projectsData[0]);
   const sectionRef = useRef(null);
   const featuredRef = useRef(null);
-  // Modified to use a less aggressive trigger for animations
   const isInView = useInView(sectionRef, { once: false, amount: 0.1 });
-  
-  // Removed the scroll-based opacity and Y transformations
-  // that were causing the visibility issues
 
   // Handle gallery project selection
   const handleProjectSelect = (project) => {
@@ -894,7 +939,7 @@ const Projects = () => {
           </motion.p>
         </motion.div>
 
-        {/* Featured project with ref for scrolling - key fix: removed scroll-based animations */}
+        {/* Featured project with ref for scrolling */}
         <div ref={featuredRef} className="mb-20">
           <FeaturedProject project={featuredProject} />
         </div>

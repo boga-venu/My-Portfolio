@@ -337,52 +337,22 @@ const StoryContent = ({ content, isVisible }) => {
             </motion.div>
           </div>
           
-          {/* Right column - Visual element */}
+          {/* Right column - Clean Profile Image */}
           <div className="lg:w-2/5">
             <motion.div
-              className="relative h-full min-h-[300px] rounded-xl overflow-hidden bg-gradient-to-br from-indigo-50 to-blue-50"
-              initial={{ opacity: 0, scale: 0.9 }}
+              className="relative h-full min-h-[300px] rounded-xl overflow-hidden flex items-center justify-center"
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={isVisible ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <motion.div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48"
-                animate={{ 
-                  rotate: [0, 360],
-                }}
-                transition={{ 
-                  duration: 40, 
-                  ease: "linear", 
-                  repeat: Infinity 
-                }}
-              >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-primary-500 opacity-20" />
-                <div className="absolute top-1/4 right-0 w-8 h-8 rounded-full bg-primary-400 opacity-40" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-primary-600 opacity-30" />
-                <div className="absolute top-1/3 left-0 w-5 h-5 rounded-full bg-primary-300 opacity-20" />
-                <div className="absolute bottom-1/4 right-0 w-7 h-7 rounded-full bg-primary-400 opacity-40" />
-              </motion.div>
-              
-              <motion.div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center"
-                animate={{ 
-                  boxShadow: ['0 0 0 0 rgba(99, 102, 241, 0)', '0 0 0 20px rgba(99, 102, 241, 0.1)', '0 0 0 0 rgba(99, 102, 241, 0)'],
-                }}
-                transition={{ 
-                  duration: 3, 
-                  ease: "easeInOut", 
-                  repeat: Infinity 
-                }}
-              >
-                <div className="text-white">
-                  <content.icon className="w-12 h-12" />
-                </div>
-              </motion.div>
-              
-              <div className="absolute inset-0 bg-grid-pattern opacity-10" 
-                  style={{ backgroundImage: `radial-gradient(#6366F1 0.5px, transparent 0.5px)`, 
-                          backgroundSize: '15px 15px' }} 
-              />
+              {/* Simple, clean profile image without frame or overlay */}
+              <div className="relative w-full h-full">
+                <img 
+                  src="/profile-image.png" 
+                  alt="Venu Gopal Boga"
+                  className="w-full h-full object-cover rounded-xl shadow-lg"
+                />
+              </div>
             </motion.div>
           </div>
         </div>
