@@ -1,6 +1,6 @@
 // src/app/layout.js
 import { Inter, Outfit } from 'next/font/google'
-import './globals.css'  // Make sure this import is present
+import './globals.css'  
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 import JsonLd from '@/components/JsonLd';
