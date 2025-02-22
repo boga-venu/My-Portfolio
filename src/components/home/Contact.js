@@ -251,11 +251,11 @@ const Contact = () => {
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       </div>
       
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-4xl mx-auto">
           {/* Section header with parallax effect */}
           <motion.div 
-            className="text-center mb-24"
+            className="text-center mb-16 md:mb-24"
             style={{ opacity, y: textY }}
           >
             <motion.div
@@ -270,7 +270,7 @@ const Contact = () => {
             </motion.div>
             
             <motion.h2
-              className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-400"
+              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-400"
               initial={{ opacity: 0, y: 20 }}
               animate={startAnimation ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.1 }}
@@ -290,7 +290,7 @@ const Contact = () => {
           
           {/* Premium Contact Card */}
           <motion.div
-            className="relative bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto"
+            className="relative bg-white rounded-2xl shadow-2xl overflow-hidden mx-auto"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={startAnimation ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -300,17 +300,17 @@ const Contact = () => {
             <div className="absolute left-0 inset-y-0 w-px bg-gradient-to-b from-transparent via-indigo-500 to-transparent"></div>
             <div className="absolute right-0 inset-y-0 w-px bg-gradient-to-b from-transparent via-indigo-500 to-transparent"></div>
             
-            <div className="px-6 md:px-12 py-12">
+            <div className="px-4 sm:px-8 md:px-12 py-12">
               <div className="grid md:grid-cols-2 gap-12 items-center">
                 {/* Left side - profile and statement */}
                 <div className="text-center md:text-left">
                   <motion.div
-                    className="flex justify-center md:justify-start items-center gap-4 mb-8"
+                    className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={startAnimation ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.4 }}
                   >
-                    <div className="w-16 h-16 relative rounded-full overflow-hidden shadow-md">
+                    <div className="w-16 h-16 relative rounded-full overflow-hidden shadow-md flex-shrink-0">
                       <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white text-lg font-bold">
                         VGB
                       </div>
@@ -322,7 +322,7 @@ const Contact = () => {
                     </div>
                     
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Venu Gopal Boga</h3>
+                      <h3 className="text-2xl font-bold text-gray-900 mt-2 sm:mt-0">Venu Gopal Boga</h3>
                       <p className="text-indigo-600">Full Stack Developer</p>
                     </div>
                   </motion.div>
@@ -333,10 +333,10 @@ const Contact = () => {
                     animate={startAnimation ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.5 }}
                   >
-                    <p className="text-gray-600 mb-4 relative">
-                      <span className="absolute -left-4 top-0 text-indigo-300 font-serif text-2xl">"</span>
+                    <p className="text-gray-600 mb-6 relative mx-4 sm:mx-0">
+                      <span className="hidden md:block absolute -left-4 top-0 text-indigo-300 font-serif text-2xl">"</span>
                       I believe in crafting digital experiences that blend innovation with functionality. Let's collaborate to bring your vision to life with modern web technologies.
-                      <span className="absolute -bottom-4 right-0 text-indigo-300 font-serif text-2xl">"</span>
+                      <span className="hidden md:block absolute -bottom-4 right-0 text-indigo-300 font-serif text-2xl">"</span>
                     </p>
                   </motion.div>
                   
@@ -364,7 +364,7 @@ const Contact = () => {
                     Reach Out
                   </motion.h4>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-4 w-full">
                     {contactMethods.map((method, index) => {
                       const colors = colorMap[method.color];
                       return (
@@ -373,34 +373,35 @@ const Contact = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={startAnimation ? { opacity: 1, y: 0 } : {}}
                           transition={{ duration: 0.6, delay: 0.4 + (index * 0.1) }}
+                          className="w-full"
                         >
                           <a
                             href={method.link}
                             target={method.link && method.link.startsWith('http') ? "_blank" : undefined}
                             rel={method.link && method.link.startsWith('http') ? "noopener noreferrer" : undefined}
-                            className={`group flex items-center gap-4 p-4 rounded-xl border ${
+                            className={`group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border ${
                               activeMethod === method.id 
                                 ? `border-${method.color}-200 bg-${method.color}-50/50` 
                                 : 'border-gray-100 hover:border-gray-200'
-                            } transition-all relative overflow-hidden`}
+                            } transition-all relative overflow-hidden w-full`}
                             onMouseEnter={() => handleMouseEnter(method)}
                             onMouseLeave={handleMouseLeave}
                             aria-label={method.ariaLabel}
                           >
                             {/* Icon */}
-                            <div className={`w-12 h-12 flex items-center justify-center rounded-lg transition-all ${colors.bg} ${colors.text} ${colors.hover}`}>
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg transition-all flex-shrink-0 ${colors.bg} ${colors.text} ${colors.hover}`}>
                               {method.icon}
                             </div>
                             
                             {/* Text */}
-                            <div className="flex-1">
-                              <h5 className="font-medium text-gray-900">{method.title}</h5>
-                              <p className="text-gray-600">{method.value}</p>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-medium text-gray-900 text-base sm:text-lg">{method.title}</h5>
+                              <p className="text-gray-600 text-sm sm:text-base truncate">{method.value}</p>
                             </div>
                             
                             {/* Action indicator */}
                             {method.link && (
-                              <div className={`w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${colors.bg}`}>
+                              <div className={`w-8 h-8 hidden sm:flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${colors.bg}`}>
                                 <ArrowRight className={`w-4 h-4 ${colors.text}`} />
                               </div>
                             )}
@@ -421,7 +422,7 @@ const Contact = () => {
                   </div>
                   
                   <motion.div
-                    className="mt-8 text-center text-gray-500 text-sm"
+                    className="mt-8 text-center md:text-left text-gray-500 text-sm"
                     initial={{ opacity: 0, y: 20 }}
                     animate={startAnimation ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.8 }}
