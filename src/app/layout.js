@@ -1,6 +1,6 @@
 // src/app/layout.js
 import { Inter, Outfit } from 'next/font/google'
-import './globals.css'  
+import './globals.css'  // Make sure this import is present
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
 import JsonLd from '@/components/JsonLd';
@@ -15,7 +15,7 @@ export const metadata = {
   authors: [{ name: 'Venu Gopal Boga' }],
   creator: 'Venu Gopal Boga',
   publisher: 'Venu Gopal Boga',
-  metadataBase: new URL('https://vgb-profile.vercel.app/'),
+  metadataBase: new URL('https://vgb-profile.minimaledgetech.com/'),
   alternates: {
     canonical: '/',
   },
@@ -29,7 +29,7 @@ export const metadata = {
   openGraph: {
     title: 'Venu Gopal Boga | Full Stack Developer',
     description: 'Full Stack Developer specializing in AI-enhanced web solutions and modern web technologies.',
-    url: 'https://vgb-profile.vercel.app/',
+    url: 'https://vgb-profile.minimaledgetech.com/',
     siteName: 'Venu Gopal Boga Portfolio',
     images: [
       {
@@ -67,8 +67,8 @@ export default function RootLayout({ children }) {
             "@context": "https://schema.org",
             "@type": "Person",
             "name": "Venu Gopal Boga",
-            "url": "https://vgb-profile.vercel.app/",
-            "image": "https://vgb-profile.vercel.app/og-image.png",
+            "url": "https://vgb-profile.minimaledgetech.com/",
+            "image": "https://vgb-profile.minimaledgetech.com/og-image.png",
             "jobTitle": "Full Stack Developer",
             "worksFor": {
               "@type": "Organization",

@@ -1,5 +1,5 @@
 export default function sitemap() {
-    const baseUrl = 'https://vgb-profile.vercel.app/'; 
+    const baseUrl = 'https://vgb-profile.minimaledgetech.com/'; 
     
     return [
       {

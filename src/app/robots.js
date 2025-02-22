@@ -4,6 +4,6 @@ export default function robots() {
         userAgent: '*',
         allow: '/',
       },
-      sitemap: 'https://vgb-profile.vercel.app/sitemap.xml', 
+      sitemap: 'https://vgb-profile.minimaledgetech.com/sitemap.xml', 
     };
   }
