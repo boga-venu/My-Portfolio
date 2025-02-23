@@ -55,7 +55,7 @@ const experiences = [
       'Led a sub-team and introduced process optimization improvements',
       'Enhanced team efficiency by 15% through process improvements'
     ],
-    skills: ['Process Optimization', 'Team Leadership', 'Digital Innovation'],
+    skills: ['Process Optimization', 'Team Leadership'],
     achievement: {
       metric: '15%',
       description: 'Efficiency improvement'
