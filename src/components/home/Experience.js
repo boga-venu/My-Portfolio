@@ -35,9 +35,7 @@ const experiences = [
     highlights: [
       'Managed consultant placements, exceeding performance benchmarks',
       'Developed negotiation and client engagement skills',
-      'Led market analysis initiatives',
-      'Grew professional network by 200+ industry connections',
-      'Implemented improved workflow systems for team collaboration'
+      'Led market analysis initiatives'
     ],
     skills: ['Client Relations', 'Market Analysis', 'Team Leadership'],
     achievement: {
@@ -55,9 +53,7 @@ const experiences = [
     highlights: [
       'Ranked #1 in Digital Coding Competition among global Cognizant teams',
       'Led a sub-team and introduced process optimization improvements',
-      'Enhanced team efficiency by 15% through process improvements',
-      'Developed technical documentation for streamlined onboarding',
-      'Contributed to innovative digital solutions for client problems'
+      'Enhanced team efficiency by 15% through process improvements'
     ],
     skills: ['Process Optimization', 'Team Leadership', 'Digital Innovation'],
     achievement: {
